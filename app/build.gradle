@@ -29,7 +29,7 @@ android {
     }
 
     packagingOptions {
-        exclude './src/main/assets/PasswordFlow.png'
+        exclude './src/main/assets/AndroidTask.pdf'
     }
 
     buildTypes {
