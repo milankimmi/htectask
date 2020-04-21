@@ -1,0 +1,119 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 29
+
+    dataBinding {
+        enabled = true
+    }
+
+    defaultConfig {
+        applicationId "com.htec.task"
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString(),
+                             "room.incremental":"true"]
+            }
+        }
+    }
+
+    packagingOptions {
+        exclude './src/main/assets/PasswordFlow.png'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    testOptions.unitTests {
+        includeAndroidResources = true
+    }
+}
+
+kapt {
+    generateStubs = true
+}
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.0'
+    testImplementation 'junit:junit:4.12'
+    testImplementation "com.google.truth:truth:${googleTruth}"
+    testImplementation 'org.mockito:mockito-core:2.28.2'
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
+    testImplementation "org.robolectric:robolectric:4.3.1"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.3.72"
+    testImplementation "com.squareup.okhttp3:mockwebserver:${okhttp3_mockwebserver}"
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:${okhttp3_mockwebserver}"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    
+    // Swipe Refresh Layout
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:${swipe_refresh_layout}"
+
+    // ViewModel + LiveData
+    implementation "android.arch.lifecycle:extensions:${arch_extensions}"
+
+    // Design Material
+    implementation "com.google.android.material:material:${material_version}"
+
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutine_version}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutine_version}"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:${retrofit}"
+    implementation "com.squareup.retrofit2:converter-gson:${retrofit}"
+    implementation "com.google.code.gson:gson:${google_gson}"
+    implementation "com.squareup.okhttp3:okhttp:${okhttp}"
+    implementation "com.squareup.okhttp3:logging-interceptor:${logging_interceptor}"
+
+    // Dagger 2
+    implementation "com.google.dagger:dagger:${dagger2}"
+    implementation "com.google.dagger:dagger-android:${dagger2}"
+    implementation "com.google.dagger:dagger-android-support:${dagger2}"
+    kapt "com.google.dagger:dagger-compiler:${dagger2}"
+    kapt "com.google.dagger:dagger-android-processor:${dagger2}"
+
+    // Joda
+    implementation "net.danlew:android.joda:${joda}"
+
+    // Room
+    implementation "androidx.room:room-runtime:${room_version}"
+    kapt "androidx.room:room-compiler:${room_version}"
+}

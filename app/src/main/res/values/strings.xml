@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">HTEC Task</string>
+
+    <string name="dialog_positive_button">OK</string>
+    <string name="dialog_negative_button">Cancel</string>
+    <string name="dialog_neutral_button">More</string>
+    <string name="dialog_delete_button">Delete</string>
+    <string name="dialog_network_connection_title">No Internet Connection</string>
+    <string name="dialog_network_connection_message">Make sure Wi-Fi or cellular data is turned on, then try again.</string>
+    <string name="dialog_network_connection_positive_button">Try again</string>
+    <string name="dialog_network_connection_negative_button">Cancel</string>
+    <string name="dialog_network_connection_neutral_button">Network</string>
+</resources>

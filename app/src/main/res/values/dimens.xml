@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Post Recycle Item Dimension -->
+    <dimen name="post_item_cardView_margin">4dp</dimen>
+    <dimen name="post_item_cardView_radius">5dp</dimen>
+    <dimen name="post_item_cardView_elevation">4dp</dimen>
+    <dimen name="post_item_parentContainer_padding">12dp</dimen>
+    <dimen name="post_title_text_size">16sp</dimen>
+    <dimen name="post_body_text_size">14sp</dimen>
+
+    <dimen name="recycleItem_binIcon_rightMargin">35dp</dimen>
+</resources>

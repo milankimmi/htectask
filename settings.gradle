@@ -1,0 +1,2 @@
+rootProject.name='HTECTask'
+include ':app'
