@@ -20,8 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
+        <activity android:name=".MainActivity" />
 
     </application>
 
