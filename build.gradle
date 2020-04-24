@@ -33,7 +33,6 @@ allprojects {
         converter_gson = "2.8.1"
         okhttp = "3.14.7"
         logging_interceptor = "3.11.0"
-        joda = "2.10.3"
         room_version  = "2.2.5"
         googleTruth = "1.0.1"
         okhttp3_mockwebserver = "3.12.0"
