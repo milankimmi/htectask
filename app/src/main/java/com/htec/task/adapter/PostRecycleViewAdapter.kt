@@ -2,6 +2,7 @@ package com.htec.task.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.htec.task.databinding.PostRecycleViewItemBinding
 import com.htec.task.datamodel.Post
@@ -42,10 +43,18 @@ class PostRecycleViewAdapter @Inject constructor(private val listener: PostClick
         return null
     }
 
-    internal fun setData(posts: ArrayList<Post>) {
-        dataSet.clear()
-        dataSet.addAll(posts)
-        notifyDataSetChanged()
+    internal fun setData(postList: ArrayList<Post>) {
+        val oldList = dataSet
+        val diffResult: DiffUtil.DiffResult =
+            DiffUtil.calculateDiff(
+                DiffUtilPostCallback(
+                    oldList,
+                    postList
+                )
+            )
+
+        dataSet = postList
+        diffResult.dispatchUpdatesTo(this)
     }
 
     override fun onPostItemClicked(position: Int, post: Post) {
