@@ -9,15 +9,25 @@ import com.htec.task.repository.RepositoryResult
 
 class PostViewModel(private val repository: Repository) : ViewModel() {
 
-    private var post: MutableLiveData<RepositoryResult<List<Post>>>? = null
-    private var user: MutableLiveData<RepositoryResult<User>>? = null
+    private var posts: MutableLiveData<RepositoryResult<List<Post>>>? = null
 
     fun getPosts(forceReload: Boolean = false): MutableLiveData<RepositoryResult<List<Post>>> {
-        post = repository.getPosts(forceReload)
-        return post!!
+        if (posts == null || forceReload || repository.isCacheExpired()) {
+            posts = repository.getPosts(forceReload)
+        }
+        return posts!!
     }
 
     fun deletePost(post: Post) {
+        var repositoryResult = posts?.value
+        if (repositoryResult?.hasResult()!!) {
+            var postList = repositoryResult.success
+            var newResult = postList?.filterIndexed { index, element ->
+                post.id != element.id
+            }
+            posts?.value = RepositoryResult(newResult, null)
+        }
+
         repository.deletePost(post)
     }
 }
