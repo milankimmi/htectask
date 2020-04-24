@@ -1,8 +1,6 @@
 package com.htec.task.utils
 
 import android.content.Context
-import android.content.SharedPreferences
-import org.joda.time.DateTime
 
 object SharedUtil {
 
@@ -17,9 +15,9 @@ object SharedUtil {
         val sharedPref = context.getSharedPreferences(PREF_CACHE_CONTROL, Context.MODE_PRIVATE)
 
         if (sharedPref.contains(CACHE_LOCAL_TIME_KEY)) {
-            var localCacheTime = sharedPref.getLong(CACHE_LOCAL_TIME_KEY, 0L)
-            var timeNow = DateTime().millis
-            var timeDifferenceInMillis = Math.abs( timeNow - localCacheTime)
+            val localCacheTime = sharedPref.getLong(CACHE_LOCAL_TIME_KEY, 0L)
+            val timeNow = System.currentTimeMillis()
+            val timeDifferenceInMillis = Math.abs(timeNow - localCacheTime)
             // 5(min) * 60(sec) * 1000 milliseconds
             return timeDifferenceInMillis >= 300000
         }
@@ -28,14 +26,14 @@ object SharedUtil {
 
     fun refreshCacheTime(context: Context) {
         val sharedPref = context.getSharedPreferences(PREF_CACHE_CONTROL, Context.MODE_PRIVATE)
-        var editor = sharedPref.edit()
-        editor.putLong(CACHE_LOCAL_TIME_KEY, DateTime().millis)
+        val editor = sharedPref.edit()
+        editor.putLong(CACHE_LOCAL_TIME_KEY, System.currentTimeMillis())
         editor.apply()
     }
 
     fun clearCacheTime(context: Context) {
         val sharedPref = context.getSharedPreferences(PREF_CACHE_CONTROL, Context.MODE_PRIVATE)
-        var editor = sharedPref.edit()
+        val editor = sharedPref.edit()
         editor.remove(CACHE_LOCAL_TIME_KEY)
         editor.apply()
     }
