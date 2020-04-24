@@ -164,7 +164,6 @@ class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListen
             neutralButtonText = applicationContext.getString(R.string.dialog_delete_button),
             cancelable = false,
             onNeutralClickListener = DialogInterface.OnClickListener { dialog, _ ->
-                recyclerAdapter.deletePostLocally(position)
                 postViewModel.deletePost(post)
                 dialog.dismiss()
             },
@@ -204,7 +203,6 @@ class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListen
     private fun swipeToDeletion() {
         // Lambda callback expression
         val swipeCallback: (adapterPosition: Int, post: Post?) -> Unit = { position, post ->
-            recyclerAdapter.deletePostLocally(position)
             post?.let { postViewModel.deletePost(it) }
         }
 
