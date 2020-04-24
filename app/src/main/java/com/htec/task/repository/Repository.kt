@@ -179,17 +179,11 @@ class Repository @Inject constructor(
         }
     }
 
-    private val job: Job = Job()
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    private fun cancelJob() {
-        if (job.isActive) {
-            Log.i(TAG, "Job is canceled!")
-            job.cancel() // Once you cancel a Job, you cannot reuse it for coroutines.
-        }
-    }
-
     override fun registerLifecycle(lifecycle: Lifecycle) {
         lifecycle.addObserver(this)
+    }
+    
+    fun isCacheExpired(): Boolean {
+        return SharedUtil.isLocalCacheExpired(context)
     }
 }
