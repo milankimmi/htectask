@@ -110,9 +110,6 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:${dagger2}"
     kapt "com.google.dagger:dagger-android-processor:${dagger2}"
 
-    // Joda
-    implementation "net.danlew:android.joda:${joda}"
-
     // Room
     implementation "androidx.room:room-runtime:${room_version}"
     kapt "androidx.room:room-compiler:${room_version}"
