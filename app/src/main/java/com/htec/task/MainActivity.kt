@@ -112,7 +112,8 @@ class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListen
             postViewModel.getPosts(forceRefresh).observe(this, Observer { repositoryResult ->
                 if (repositoryResult.hasResult()) {
                     repositoryResult.success?.let {
-                        recyclerAdapter.setData(it as ArrayList<Post>)
+                        recyclerAdapter.setData(it as ArrayList<Post>) 
+                        recycleView.scrollToPosition(0)
                     }
                 } else {
                     // Error handling - can be solved on many ways
