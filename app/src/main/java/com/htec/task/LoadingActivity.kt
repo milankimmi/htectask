@@ -20,7 +20,6 @@ class LoadingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        makeFullScreen()
         setContentView(R.layout.activity_loading)
     }
 
@@ -40,6 +39,7 @@ class LoadingActivity : AppCompatActivity() {
         if ((SharedUtil.hasLocalCache(this) && !SharedUtil.isLocalCacheExpired(this))
             || ConnectivityUtil.hasActiveInternetConnection(this)
         ) {
+            // fake delay as part of client-server communication
             Handler().postDelayed({
                 startActivity(Intent(this@LoadingActivity, MainActivity::class.java))
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -54,6 +54,7 @@ class LoadingActivity : AppCompatActivity() {
 
         var positiveClickListener: (dialog: DialogInterface, which: Int) -> Unit =
             { dialog, _ ->
+                // fake delay as part of client-server communication
                 Handler(Looper.getMainLooper()).postDelayed({
                     dialog.dismiss()
                     checkNetworkConnection()
@@ -84,19 +85,5 @@ class LoadingActivity : AppCompatActivity() {
             onNegativeClickListener = negativeClickListener,
             onNeutralClickListener = neutralClickLitener
         )
-    }
-
-    private fun makeFullScreen() {
-        // Remove Title
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-
-        // Make fullcreen
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
-
-        // Hide the toolbar
-        supportActionBar?.hide()
     }
 }
