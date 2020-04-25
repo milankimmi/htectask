@@ -1,28 +1,26 @@
 package com.htec.task
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.htec.task.adapter.SwipeManageAdapter
 import com.htec.task.adapter.PostRecycleViewAdapter
-import com.htec.task.di.component.DaggerMainActivityComponent
-import com.htec.task.di.module.ActivityContextModule
-import com.htec.task.di.qualifier.ActivityContext
+import com.htec.task.adapter.SwipeManageAdapter
 import com.htec.task.datamodel.Post
 import com.htec.task.datamodel.User
+import com.htec.task.di.component.DaggerMainActivityComponent
+import com.htec.task.di.module.ActivityContextModule
 import com.htec.task.utils.ConnectivityUtil
 import com.htec.task.utils.DialogUtil
 import com.htec.task.utils.SharedUtil
@@ -30,14 +28,11 @@ import com.htec.task.viewmodel.PostViewModel
 import com.htec.task.viewmodel.UserViewModel
 import com.htec.task.viewmodel.ViewModelFactory
 import java.io.IOException
-import java.lang.StringBuilder
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListener {
+const val NETWORK_REQUESTED_CODE: Int = 999
 
-    @Inject
-    @ActivityContext
-    lateinit var context: Context
+class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListener {
 
     @Inject
     lateinit var recyclerAdapter: PostRecycleViewAdapter
@@ -52,7 +47,6 @@ class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListen
     lateinit var progressLoader: ProgressBar
     lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
-    private var actionFlag: Boolean = false
     private var alertDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,12 +57,13 @@ class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListen
         postViewModel = ViewModelProvider(this, viewModelFactory).get(PostViewModel::class.java)
         userViewModel = ViewModelProvider(this, viewModelFactory).get(UserViewModel::class.java)
 
+
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
         recycleView = findViewById(R.id.postRecyclerView)
         progressLoader = findViewById(R.id.progressBarLoader)
 
         recycleView.adapter = recyclerAdapter
-        recycleView.layoutManager = LinearLayoutManager(context)
+        recycleView.layoutManager = LinearLayoutManager(this)
 
         swipeRefreshLayout.isRefreshing = true
         swipeRefreshLayout.setOnRefreshListener {
@@ -77,23 +72,7 @@ class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListen
         }
 
         swipeToDeletion()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        alertDialog?.let {
-            if (it.isShowing) {
-                it.dismiss()
-            }
-        }
-
-        if (!actionFlag) {
-            fetchPosts()
-        } else {
-            fetchPosts(true)
-            actionFlag = false
-        }
+        fetchPosts()
     }
 
     private fun doDaggerInjection() {
@@ -112,7 +91,7 @@ class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListen
             postViewModel.getPosts(forceRefresh).observe(this, Observer { repositoryResult ->
                 if (repositoryResult.hasResult()) {
                     repositoryResult.success?.let {
-                        recyclerAdapter.setData(it as ArrayList<Post>) 
+                        recyclerAdapter.setData(it as ArrayList<Post>)
                         recycleView.scrollToPosition(0)
                     }
                 } else {
@@ -159,12 +138,13 @@ class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListen
             .append("E-mail: " + user.email)
             .toString()
 
-        alertDialog = DialogUtil.showCustomDialog(context,
+        alertDialog = DialogUtil.showCustomDialog(this,
             title = post.title,
             message = dialogMessage,
             neutralButtonText = applicationContext.getString(R.string.dialog_delete_button),
             cancelable = false,
             onNeutralClickListener = DialogInterface.OnClickListener { dialog, _ ->
+                //@deprecated > recyclerAdapter.deletePostLocally(position)
                 postViewModel.deletePost(post)
                 dialog.dismiss()
             },
@@ -193,24 +173,31 @@ class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListen
             },
             onNeutralClickListener = DialogInterface.OnClickListener { dialog, _ ->
                 dialog.dismiss()
-                actionFlag = true
                 swipeRefreshLayout.isRefreshing = false
                 val intent: Intent = Intent(Settings.ACTION_WIRELESS_SETTINGS)
-                startActivity(intent)
+                startActivityForResult(intent, NETWORK_REQUESTED_CODE)
             }
         )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == NETWORK_REQUESTED_CODE) {
+            fetchPosts(true)
+        }
     }
 
     private fun swipeToDeletion() {
         // Lambda callback expression
         val swipeCallback: (adapterPosition: Int, post: Post?) -> Unit = { position, post ->
+            // @deprecated > recyclerAdapter.deletePostLocally(position)
             post?.let { postViewModel.deletePost(it) }
         }
 
         val itemTouchHelperCallback = SwipeManageAdapter(
             swipeCallback,
             recyclerAdapter,
-            context,
+            this,
             ItemTouchHelper.ACTION_STATE_IDLE,
             ItemTouchHelper.LEFT
         )
@@ -230,7 +217,7 @@ class MainActivity : AppCompatActivity(), PostRecycleViewAdapter.PostClickListen
             } else {
                 repositoryResult.error?.let { throwable ->
                     var message: String? = if (throwable is IOException) {
-                        context.getString(R.string.dialog_network_connection_message)
+                        this@MainActivity.getString(R.string.dialog_network_connection_message)
                     } else {
                         throwable.message
                     }
