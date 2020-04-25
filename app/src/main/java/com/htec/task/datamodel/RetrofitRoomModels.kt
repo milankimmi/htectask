@@ -12,6 +12,23 @@ data class Post(
     @ColumnInfo(name = "body") @SerializedName("body") val body: String
 ) {
     constructor() : this(0, 0, "", "")
+    
+    override fun equals(other: Any?): Boolean {
+        if (javaClass != other?.javaClass) {
+            return false
+        }
+        val otherPost = other as Post
+        if (id != otherPost.id)
+            return false
+        if (userId != otherPost.userId)
+            return false
+        if (title != otherPost.title)
+            return false
+        if (body != otherPost.body)
+            return false
+
+        return true
+    }
 }
 
 @Entity(tableName = "User")
