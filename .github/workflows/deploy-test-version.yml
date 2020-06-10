@@ -1,0 +1,91 @@
+name: Deploy Test Version
+
+on:
+  pull_request:
+    types: [ closed ]
+    branches: [ develop ]
+
+jobs:
+  test:
+    name: Distribute test build
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      # Get current branch within github actions
+      - name: Extract Branch Name
+        shell: bash
+        # run: "::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})"
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})'
+          echo REPO_NAME=${GITHUB_REPOSITORY##*/}
+          echo GITHUB_REF=${GITHUB_REF}
+          echo EXTRACT_GITHUB_REF=${GITHUB_REF##*/}
+          echo EXTRACT_GITHUB_REF_HEADS=$(echo ${GITHUB_REF#refs/heads/})
+        id: extract_branch
+
+      - name: Deploy Test Version
+        run: |
+          touch testing.properties
+          touch app/tokenvault-android-firebase.json
+          echo '${{secrets.TEST_PROPERTIES}}' > testing.properties
+          echo '${{secrets.MOBILE_FIREBASE_DISTRIBUTION}}' > app/tokenvault-android-firebase.json
+          cd app; ../gradlew :app:distributeTokenVaultTest --stacktrace
+
+      - name: Increment Build Number
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git checkout ${{ steps.extract_branch.output.branch }}
+          cd app; ../gradlew :app:incrementBuildNumber
+          git commit -m "Increased build number" build.properties
+          ../gradlew :app:clearReleaseNotes
+          git commit -m "Cleared release notes" release-notes.txt
+
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{steps.extract_branch.output.branch}}
+
+  successNotification:
+    needs: test
+    name: Success Notification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2.0.2
+        env:
+          SLACK_CHANNEL: mobile-test-builds
+          SLACK_USERNAME: GitHub-Actions
+          SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/Octocat.png
+          SLACK_COLOR: '#6CB535'
+          SLACK_TITLE: New Android version
+          SLACK_MESSAGE: New Android version is ready for testing
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+  failedNotification:
+    needs: test
+    if: ${{ failure() }}
+    name: Failure Notification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2.0.2
+        env:
+          SLACK_CHANNEL: mobile-test-builds
+          SLACK_USERNAME: GitHub-Actions
+          SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/Octocat.png
+          SLACK_COLOR: '#EB2C1E'
+          SLACK_TITLE: New Android version
+          SLACK_MESSAGE: Failed to build and send new Android version
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
