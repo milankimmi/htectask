@@ -23,7 +23,7 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString(),
-                             "room.incremental":"true"]
+                             "room.incremental"   : "true"]
             }
         }
     }
@@ -32,7 +32,15 @@ android {
         exclude './src/main/assets/AndroidTask.pdf'
     }
 
+    signingConfigs {
+        debug {
+            storeFile file('./debug.keystore')
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -82,7 +90,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    
+
     // Swipe Refresh Layout
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:${swipe_refresh_layout}"
 
